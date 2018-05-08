@@ -1,0 +1,667 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% writeLaTeX Example: A quick guide to LaTeX
+%
+% Source: Dave Richeson (divisbyzero.com), Dickinson College
+% 
+% A one-size-fits-all LaTeX cheat sheet. Kept to two pages, so it 
+% can be printed (double-sided) on one piece of paper
+% 
+% Feel free to distribute this example, but please keep the referral
+% to divisbyzero.com
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% How to use writeLaTeX: 
+%
+% You edit the source code here on the left, and the preview on the
+% right shows you the result within a few seconds.
+%
+% Bookmark this page and share the URL with your co-authors. They can
+% edit at the same time!
+%
+% You can upload figures, bibliographies, custom classes and
+% styles using the files menu.
+%
+% If you're new to LaTeX, the wikibook is a great place to start:
+% http://en.wikibooks.org/wiki/LaTeX
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt,landscape]{article}
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath,amsthm,amsfonts}
+\usepackage{multicol,multirow}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[landscape]{geometry}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+
+
+\ifthenelse{\lengthtest { \paperwidth = 11in}}
+    { \geometry{top=0in,left=.1in,right=.1in,bottom=.2in} }
+	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
+	}
+\pagestyle{empty}
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
+                                {-1explus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%
+                                {\normalfont\footnotesize\bfseries}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {1ex plus .2ex}%
+                                {\normalfont\scriptsize\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.0ex}
+% -----------------------------------------------------------------------
+
+\title{A \LaTeX{} CS540 Final Study Guide, Spring 2018 - Jack Farrell}
+
+\begin{document}
+
+\raggedright
+\footnotesize
+
+\begin{center}
+     \Large{\textbf{A \LaTeX{} CS540 Final Study Guide, Spring 2018} - Jack Farrell} 
+\end{center}
+\begin{multicols}{3}
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\section{**Constraint Satisfaction} 
+Constraint Satisfaction Problems (CSPs) : 
+
+\textbf{-state} is defined by \textbf{variables} $X_i$ with \textbf{values} from \textbf{domain} $D_i$
+
+\textbf{-goal test} is a set of \textbf{constraints} specifying allowable cominations of values for subsets of variables
+
+-Main idea of CSPs is to eliminate large portions of the search space all at once by identifying variable/value combos that violate constraints
+%Problem formulation in terms of variables, domains and constraints, constaint graph, DFS, backtracting w/ consistency checking, most constrained var heuristic, most constraining var heuristic, most constraining variable heuristic, least constraining value heuristic, min-conflicts heuristic, min-conflicts algo, forward checking algo, arc consistency algo (AC-3), combining search with CSP inference
+
+\subsection{*Problem formulation in terms of variables}
+
+\textbf{Examples:} N-Queens, Cryparithmetic, Graph/Map Coloring, Scheduling Problems
+
+\textbf{Map-Coloring Example:} 
+
+Variables: WA, NT, Q, NSW, V, SA, T
+
+Domains: $D_i$ = {red,green,blue}
+
+Constraints: adjacent regions must have different colors
+
+\textbf{Solutions} are \textbf{complete}(i.e., all vars are assigned values) and \textbf{consistent}(i.e., doesn't violate any constraints) assignments
+
+\subsection{*Domains and constraints}
+\textbf{Varieties of CSPs:}
+
+\textbf{Discrete variables}
+
+finite domains: n variables, domain size $d \to{O(d^n)}$ e.g., Boolean CSPs, Boolean satisfiability
+
+infinite domains: integers, strings, etc e.g., job scheduling, variables are start/end times for each job
+
+\textbf{Continuous Variables}
+
+e.g., start/end times for Hubble Space Telescope observations
+
+linear constraints solvable in polynomial time by linear programming
+
+\textbf{Constraint Types}
+
+\textbf{-Unary} constraints involve a single variable (e.g.,  $SA \ne green$)
+
+\textbf{-Binary} constraints involve pairs of variables (e.g, $SA \ne WA$)
+
+\textbf{-Higher-order} constraints involve 3 or more variables (e.g., cryptarithmetic column constraints)
+
+\subsection{*Constraint Graph}
+\textbf{-Binary CSP:} each constraint relates \textbf{two} variables
+
+\textbf{-Constraint graph:} nodes are \textbf{variables}, arcs are \textbf{constraints}
+
+\subsection{*DFS}
+
+-Variable assignments are \textbf{commutative}, i.e., WA=R then NT=G same as NT=G then WA=R
+
+\textbf{-Generate-and-test strategy}: Generate candidate soln, then test if it satisfies all constraints. Makes DFS look very stupid.
+
+\subsection{*BackTracking(DFS) w/ Consistency Check}
+\setlength\partopsep{-\topsep}
+\addtolength\partopsep{-\parskip}
+\addtolength\partopsep{0em}
+\textbf{-Improved DFS!} Goes down one var at a time, at deadend, backs up to last var whose val can change w/o  violating constraints, and changes it
+
+-If you backed up to the root and tried all values, there is no soln
+
+-Complete Algo, will find soln if it exists
+
+-Don't generate a successor that creates an inconsistency with any \emph{existing} assignment, i.e., perform \textbf{consistency checking} when node is generated.
+
+-Successor function assigns a value to an unassignment variable that does \textbf{not} conflict with all current assignments 
+
+\quad Deadend if no legal assignments(No successors)
+\linespread{0}
+\begin{verbatim}
+Algorithm
+Start with empty state
+while not all vars in state assigned a value do
+  Pick a variable(randomly or w/ heur)
+  if it has a value that doesn't violate any constraints
+    then Assign that value
+  else
+    go back to prev var and assign it another val
+\end{verbatim}
+\subsection{*Most Constrained Var Heur}
+-Choose variable with the fewest legal moves(most constraining variable)
+
+-Called \textbf{minimum remaining values (MRV)} heuristic.
+
+-Minimizes branching factor; Tries to cut off search ASAP
+
+\subsection{*Most \emph{Constraining} Var Heur}
+-Tie-breaker among most-constrained vars
+
+-Choose var with the most constraints on the remaining variables
+
+-Called the \textbf{degree heuristic}(reduces the branching factor on future choices by selecting varible involved in largest \# of constraints on other unassigned vars, tries to cut off search ASAP
+
+\subsection{*Least Const Var Heur}
+-Variable that rules out the fewest vals in remaining vars
+
+-try to pick values \emph{best} first
+\subsection{*Min-Conflicts Heur}
+
+-choose value that violates fewest constraints, i.e., hill-climb by minimizing f(n) = total \# of violated constraints
+\subsection{*Min-Conflicts Algo}
+\setlength\partopsep{-\topsep}
+\addtolength\partopsep{-\parskip}
+\addtolength\partopsep{0em}
+\begin{verbatim}
+1. Assign to each variable a random value, defining the 
+initial state
+2. while state not consistent do
+ 2.1 Pick a variable, var, that has constraint(s) violated
+ 2.2 Find value, v, for var that minimizes the total number 
+ of violated constraints (over all variables)
+ 2.3 var = v
+\end{verbatim}
+
+-Advantages:
+Simple and Fast: Given rand init state, can solve n-queens in almost O(1)
+
+-Disadvantages:
+
+\quad -Only searches states that are reachable from the init state(May not search entire state space)
+
+\quad -Does not allow worse moves (but can move to neighbor w/ same cost; can get stuck at loc optimum)
+
+\quad -Not complete, may not find a soln 
+
+\subsection{*Forward Checking Algorithm}
+-For each var, record the \textbf{set of all possible legal values for it}
+
+-When val assign to var in search, update set of legal vals for \textbf{all} unassigned vars.  Backtrack immediately if you \textbf{empty} a variable's set of possible values
+
+-Keep track of \textbf{remaining legal values} for all variables
+
+-Deadend when any var has \textbf{no} legal values
+
+-propagates info from assigned to unassigned vars; doesn't provide early detection for all failures
+
+\textbf{-Constraint propagation} recursively enforces constraints for all vars
+\linespread{0}
+\begin{itemize}
+\item \textbf{Main idea:} if value deleted from var's domain, check all vars connected to \emph{it}. If any change,, delete all inconsistent values connected to them, etc.
+\end{itemize}
+
+
+\subsection{*Arc Consistency Algo(AC-3)}
+
+\textbf{Arc Consistency}: Simplest form of propagation makes each \textbf{arc consistent}
+
+{\scriptsize
+- $X\to Y$ is consistent \textbf{if} for \textbf{every} value x at var X there is \textbf{some} allowed y, i.e. there is at least 1 value of Y t.s. consistent with x at X, \textbf{if not, delete x}
+}
+
+\includegraphics[width=1.5in,height=1in,keepaspectratio]{ac_3_algorithm.png}
+\includegraphics[width=1.5in,height=1in,keepaspectratio]{Revise.PNG}
+
+\subsection{*Combining Search w/ CSP Inference}
+
+{\scriptsize
+\textbf{-Idea:} Interleave search and CSP inference
+
+\textbf{-Perform DFS}: At each node, assign a selected value to a selected var, \textbf{then} run CSP to reduce vars' domains and check if any inconsistencies arise as a result of this assignment
+}
+\includegraphics[width=2.5in,height=1.2in]{combosearch.PNG}
+
+%------------------------------------------------------------
+
+\section{**Support Vector Machines}
+
+-Used for Classification, Regression and data-fitting, and Supervised/unsupervised learning
+
+-Can only handle two-class problems
+
+-\emph{k-class problem:} split task into k \textbf{binary} tasks and learn k SVMs
+%Maximum margin, defn of margin, kernel trick, support vectors, slack variables
+
+\subsection{*Maximum Margin}
+
+\textbf{-Margin}: distance from center dec line to nearest data point, \textbf{max margin} is a dec boundary w/ largest possible dist
+
+-Computed w/ + plane = $\textbf{w}^T\textbf{x} + b = +1$(- plane same but `= -1')
+
+
+
+\subsection{*Slack Variables}
+
+-For Non-LSVMs, one option is to allow a few points on the wrong side (slack vars) $\to$ ``Soft Margin Classification''
+
+-How? $\to Minimize, ||\textbf{w}^2|| + C(\# trainerrors)$(C is tradeoff ``penalty'' param), solving may be slow since it can't be expressed as a quad programming prob
+
+-\textbf{C} needs a good val cause, if it's too big, similar to LSVM \& could \textbf{overfit}, if too small, allows many misclassifications \& may \textbf{underfit}. \textbf{Optimization criterion?} $\to Minimize \frac{1}{2} \textbf{w}^T + C\sum_{k=1}^{N}\varepsilon_k$, where $\varepsilon_k$ is the $k^th$ slack variable dist to the correct dec boundary margin, and N is \# constraints($\varepsilon_k = 0$ for correct zone)
+
+-$\textbf{w}^T\textbf{x} + b \ge 1 - \varepsilon_k if y_k = +1 \& \textbf{w}^T\textbf{x} + b \le -1 + \varepsilon_k if y_k = -1$
+
+\subsection{*Kernel Trick}
+
+-Other option for Non-LSVMs, Maps data to a higher dimensional space, \& then do linear classification
+
+-\textbf{Example:} $\Phi(x) = (x, x^2)$ 1D $\to$ 2D
+
+-Also, use $\textbf{w}^T\Phi(\textbf{x}) + b = \pm1$
+
+-For 2D $\to$ 3D: $\Phi(x_1,x_2) = (x_1,x_2,\sqrt{x_1^2 + x_2^2})$
+
+\begin{tabbing}
+-Common Kernels: \= \textbf{Linear}: $K(\textbf{x}_i,\textbf{x}_j) = \textbf{x}_i^T\textbf{x}_j$\\
+
+\>\textbf{Quadratic}: $K(\textbf{x}_i,\textbf{x}_j) = (\textbf{x}_i^T\textbf{x}_j + 1)^2$\\
+\end{tabbing}
+%-------------------------------------------------------------
+\section{**Neural Networks}
+   
+\textbf{Activation function}: Computes an output scalar val using simple non linear func of the linear combo of its inputs
+
+\textbf{LTU}: Activation flips from 0 to 1 when activation func $\ge$ threshold $b$
+
+-Given n inputs, a unit's \textbf{activation}(output) is $g(in) = g(\sum_{i=1}^{n} w_i x_i)$
+
+%\newpage
+\textbf{Sigmoid Function}: $\frac{1}{1+e^-x}$, Derivative: $g'(x) = g(x)(1-g(x))$
+
+-slow learning because ``saturated'' units ``kill'' gradients
+
+\textbf{ReLU}: $g(z) = max(0,z)$, $g'(z) = \begin{cases} 0, & if z \le 0\\1, & otherwise\end{cases}$
+
+-Reaches 25\% error rate 6x faster than sigmoid
+
+\textbf{Softmax}: $g(z_j) = \frac{e^{z_j}}{\sum_{k=1}^{K}e^{z_k}}$i
+
+-All output units sum to 1, i.e., [3,1,1] $\to$ [.78,.11,.11]
+%Perceptron, LTU, activation functions, bias input, input units, output units, Perceptron learning rule, Perceptron learning algorithm, Perceptron convergence thm, epoch, weight space, input space, linearly separable, credit assignment problem, multi-layer feed-forward networks, hidden units, sigmoid func, ReLU, softmax, back-prop algo, gradient descent search in weight space, stochastic gradient descent, parameter setting using a tuning set, deep learning, convolutional neural networks, pooling
+
+\subsection{*Perceptron}
+
+\textbf{``1-layer network''}: one or more output units, Output units are all LTUs
+
+\textbf{Perceptron Learning Rule}: $w_i = w_i + \Delta w_i$ where $\Delta w_i = \alpha x_i(T-O)$, where $x_i$ is input associated with $i^{th}$ input unit, $\alpha$ is the learning rate between 0.0-1.0
+
+-Determining how to update the weights is an instance of the \textbf{credit assignment problem}, which is determining which weights to credit/blame for the output error in the network, and how to update them
+
+-"local" learning rule; only local info in network needed to update $w$, performs \textbf{gradient descent (hill-climbing) in "weight space"}
+
+-Can only learn funcs that are \textbf{linearly separable}(in \textbf{input space})
+
+-\textbf{Algorithm}: \textbf{1.} Init network weights \textbf{2.} Repeat until all examples correctly classified/stopping criteria met(epochs)
+
+\textbf{Perceptron Convergence Thm}: If a set of examples is learnable, PLR will find appropriate set of weights in 1. finite steps, 2. indep of init weights, 3. using sufficiently small $\alpha$ value
+
+\subsection{*Multi-Layer, Feed-Forward Networks}
+
+-Gotta solve the Credit Assingment Problem!
+
+\begin{tabbing}
+-Ba\=ck-Propogation: Method for learning weights in networks, \\
+        generalizes PLR\\
+\>-Approach $\to$ \textbf{Gradient-descent algo} to minimize total \\\>error on train set. \\
+\>-Errors are propagated through the network starting at the \\\>output units and working backwards towards the input units
+\end{tabbing}
+
+\textbf{Back-Prop using Stochastic Gradient Descent}:
+
+-\textbf{Back-Prop} performs a \textbf{gradient descent search} in ``weight space'' to learn network weights
+
+-\textbf{Updating Weights}
+
+-Given a network w/ n weights: \textbf{-}each config of weights is a vector, \textbf{W}, of length n that defines an instance of the network. \textbf{-W} can be considered a pt in a n-D \textbf{weight space}, where each dimension is associated w/ 1 of the connections in the network
+
+-Given a train set of m exmpls: \textbf{-}Each net defn by vector \textbf{W} has an associated total error, \textbf{E}, on all train data E(Sum squared error) = $\sum_{i=1}^{m} E_i$, Given t output units, $E_i = \sum_{i=1}^{t} (T_i - O_i)^2$ 
+
+\textbf{For 2-Layer}
+
+-\textbf{H-O Weights}: $\Delta w_{j,k} = \alpha a_j \Delta_k$, $\Delta_k=(Err_k)(g'(in_k)$,$\alpha_j$=output 
+
+-\textbf{I-H Weights}: $\Delta w_{i,j} = \alpha a_i \Delta_j$, $\Delta_j=g'(in_j)\sum_{k}w_{j,k}\Delta_k$
+
+\textbf{Back-Prop Algo}
+
+\includegraphics[width=3in,height=1.3in]{backprop.PNG}
+
+{\scriptsize
+-Issues With Back-Prop: Requires labeled train data(almost all data unlabeled), Learning time doesn't scale well(very slow to converge in networks w/ multiple hidden layers), might get stuck at poor local optimum, overfitting
+}
+
+\subsection{*Param Setting W/ Tune Set}
+
+-Use a tuning set(validation set) to train using several andidate values for $\alpha$, and select val that gives lower err
+
+-Train network until err rate on a \textbf{tuning set} begins increasing rather than training until err on train is minimized
+
+-How many hidden units in a layer? Too few, concept can't be learned. Too many, examples memorized/overfitting
+
+\textbf{Dropout}: To prevent overfit, during train, at each hidden layer, ``drop out'' a rand set of units from that layer by setting outputs to 0 in forward pass
+
+-Each unit is retained with prob p = 0.5
+
+-Back-prop is performed only on thinned network
+
+-During testing, use whole net(weights must all be rescaled)
+
+\subsection{Deep Learning}
+
+-Use many hidden layers(often 10-20)
+
+-Automatically learns features from the raw data
+
+-\textbf{Issues Training Deep Networks}: Bottom layers don't get trained easily, small data sets result in not enough labeled data for training, use a pre-processing step to init weights, use traditional back-prop to train full net
+
+\subsection{Convolutional Neural Networks}
+
+-Extension of multi-layer, feed-forward nets that incorporate the following: Use of \textbf{many layers}(learn a hierarchy of features), \textbf{Local "receptive fields"/filters and local connections}(Layers aren't completely connected, Want translation-invariant local features), \textbf{Shared weights, Pooling}
+
+\textbf{Convolution Operation}: $h[m,n] = \sum_{k,l}g[k,l]f[m-k,n-l]$(replace - with + for image filtering)
+
+-\textbf{In CNN's, $f$ corresponds to the inputs from the layer below and $g$ corresponds to the weights}
+
+\textbf{Convolution Layers}: Learn ``filters''(weights) that process small regions of the layer below it an compute ``features'' at many spatial positions
+
+-\textbf{Ex:} 32x32x3 image w/ 5x5 filter.  Each unit will have weights connected to a 5x5x3 region in input layer(75 weights)
+
+\begin{tabbing}
+ReL\=U Layers\\
+\>-Each Conv layer usually followed by ReLU layer, applies ReLU \\\>func to conv layer output\\
+\>-No weights to be learned\\
+\>-Layer size = to size of layer below it\\
+\end{tabbing}
+
+\subsection{Pooling}
+
+\textbf{Pooling Layers}: Follows ReLU layer.  Combines neighboring values to give a single output at the next layer. \textbf{Max Pooling}: Combine by taking max, \textbf{Avg Pooling}, \textbf{Sub-Sampling}: Reduces size of next layer according to size of pooling filter. \textbf{ex:}a 2x2 filter reduces size by $\frac{1}{2}$ in each dimension
+
+\section{**Reasoning under Uncertainty}
+
+\textbf{Random Variable}: A var, X, whose domain is a sample space, w/ somewhat uncertain val.  \textbf{Ex:} X = coin flip outcome \textbf{Mutually Exclusive:} discrete number of outcome. \textbf{Prior Prob}: a single probability(P(A=a) or P(a))
+
+\textbf{3 Axioms of probability}: \textbf{1.} $0 \le P(A) \le 1$ \textbf{2.} $P(true)=1,P(false)=0$ \textbf{3.} $P(A\lor B)=P(A)+P(B) - P(A\land B)$
+
+\textbf{Joint Probability}: P(A=a, B=b), shorthand $P(A=a\land B=b)$
+
+\textbf{Conditional Prob}: P(a | e): fraction of time 
+%Random variable, mutually exclusive, prior probability, 3 axioms of probability, joint probability, conditional probability, posterior probabililty, full joint probability distro, degrees of freedom, summing out, marginalization, normalization, product rule, chain rule, conditionalized version of summing out, marginalization, normalization, product rule, chain rule, Baye's rule, conditionalized version of Bayes's rule, addition/conditioning rule, independence, conditional independence, naive Bayes classifier, add-1 smoothing, Laplace smoothing.
+
+ 
+\section{**Bayesian Networks} 
+
+%Bayesian network DAG, conditional probability tables, space saving compared to full joint prob distro table, conditional independence property defined by a Bayesian network, inference by enumeration from a Bayesian network, naive Bayes classifier, add-1 smoothing, Laplace smoothing
+
+
+
+\section{**Speech Recognition}
+
+%Phones, phonemes, speech recog using Bayes's rule, language model, acoustic model, bigram model, trigram model, first-order Markov assumption, probabilistic finit state machine, first-order Markov model, state transition matrix, pi vector, computing conditional probabilities from a Markov model, hidden Markov model, observation likelihood matrix, computing joint probabilities and conditional probabilities from an HMM by enumeration.  (Nothing ond Forward algo, Viterbi algo, Forward-Backward algo, Siri, particle filters, tracking in video.)
+
+
+
+\section{**Computer Vision}
+
+%Viola-Jones face detection algo, boosting ensemble learning, AdaBoost algo, weak classifier, weighted-majority classification, decision stump.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\newpage
+
+\subsection{Functions}
+\begin{tabular}{lll}
+\emph{description} & \emph{command} & \emph{output}\\
+maps to & \verb!\to! & $\to$\\
+composition& \verb!\circ! & $\circ$\\
+piecewise& \verb!|x|=! & \multirow{5}{*}{$\displaystyle |x|=\begin{cases}x&x\ge 0\\-x&x<0\end{cases}$}\\
+function&\verb!\begin{cases}!&\\ 
+&\verb!x & x\ge 0\\!&\\ 
+&\verb!-x & x<0!&\\ 
+&\verb!\end{cases}!&
+\end{tabular}
+
+\subsection{Greek and Hebrew letters}
+\begin{tabular}{llll}
+\emph{command} & \emph{output}&\emph{command} & \emph{output}\\
+\verb!\alpha! & $\alpha$&\verb!\tau! & $\tau$\\
+\verb!\beta! & $\beta$&\verb!\theta! & $\theta$\\
+\verb!\chi! & $\chi$&\verb!\upsilon! & $\upsilon$\\
+\verb!\delta! & $\delta$&\verb!\xi! & $\xi$\\
+\verb!\epsilon! & $\epsilon$&\verb!\zeta! & $\zeta$\\
+\verb!\varepsilon! & $\varepsilon$&\verb!\Delta! & $\Delta$\\
+\verb!\eta! & $\eta$&\verb!\Gamma! & $\Gamma$\\
+\verb!\gamma! & $\gamma$&\verb!\Lambda! & $\Lambda$\\
+\verb!\iota! & $\iota$&\verb!\Omega! & $\Omega$\\
+\verb!\kappa! & $\kappa$&\verb!\Phi! & $\Phi$\\
+\verb!\lambda! & $\lambda$&\verb!\Pi! & $\Pi$\\
+\verb!\mu! & $\mu$&\verb!\Psi! & $\Psi$\\
+\verb!\nu! & $\nu$&\verb!\Sigma! & $\Sigma$\\
+\verb!\omega! & $\omega$&\verb!\Theta! & $\Theta$\\
+\verb!\phi! & $\phi$&\verb!\Upsilon! & $\Upsilon$\\
+\verb!\varphi! & $\varphi$&\verb!\Xi! & $\Xi$\\
+\verb!\pi! & $\pi$&\verb!\aleph! & $\aleph$\\
+\verb!\psi! & $\psi$&\verb!\beth! & $\beth$\\
+\verb!\rho! & $\rho$&\verb!\daleth! & $\daleth$\\
+\verb!\sigma! & $\sigma$&\verb!\gimel! & $\gimel$
+\end{tabular}
+
+
+\subsection{Set theory}
+\begin{tabular}{lll}
+\emph{description} & \emph{command} & \emph{output}\\
+set brackets & \verb!\{1,2,3\}! & $\{1,2,3\}$\\
+element of & \verb!\in! & $\in$\\
+not an element of & \verb!\not\in! & $\not\in$\\
+subset of & \verb!\subset! & $\subset$\\
+subset of & \verb!\subseteq! & $\subseteq$\\
+not a subset of & \verb!\not\subset! & $\not\subset$\\
+contains & \verb!\supset! & $\supset$\\
+contains & \verb!\supseteq! & $\supseteq$\\
+union & \verb!\cup! & $\cup$\\
+intersection & \verb!\cap! & $\cap$\\
+big union & 
+\verb!\bigcup_{n=1}^{10}A_n! &
+$\displaystyle \bigcup_{n=1}^{10}A_{n}$\\
+big intersection & \verb!\bigcap_{n=1}^{10}A_n! &$\displaystyle \bigcap_{n=1}^{10}A_{n}$\\
+empty set & \verb!\emptyset! & $\emptyset$\\
+power set & \verb!\mathcal{P}! & $\mathcal{P}$\\
+minimum & \verb!\min! & $\min$\\
+maximum & \verb!\max! & $\max$\\
+supremum & \verb!\sup! & $\sup$\\
+infimum & \verb!\inf! & $\inf$\\
+limit superior & \verb!\limsup! & $\limsup$\\
+limit inferior & \verb!\liminf! & $\liminf$\\
+closure & \verb!\overline{A}! & $\overline{A}$
+\end{tabular}
+
+\subsection{Calculus}
+\begin{tabular}{lll}
+\emph{description} & \emph{command} & \emph{output}\\
+derivative & \verb!\frac{df}{dx}! & $\displaystyle \frac{df}{dx}$\\
+derivative & \verb!\f'! & $f'$\\
+partial derivative & 
+\begin{tabular}{l}
+\verb!\frac{\partial f}!\\ \verb!{\partial x}! 
+\end{tabular}& $\displaystyle \frac{\partial f}{\partial x}$\\
+integral & \verb!\int! & $\displaystyle\int$\\
+double integral & \verb!\iint! & $\displaystyle\iint$\\
+triple integral & \verb!\iiint! & $\displaystyle\iiint$\\
+limits & \verb!\lim_{x\to \infty}! & $\displaystyle \lim_{x\to \infty}$\\
+summation  & 
+\verb!\sum_{n=1}^{\infty}a_n! &
+$\displaystyle \sum_{n=1}^{\infty}a_n$\\
+product  & 
+\verb!\prod_{n=1}^{\infty}a_n! &
+$\displaystyle \prod_{n=1}^{\infty}a_n$
+\end{tabular}
+
+
+
+
+\subsection{Logic}
+\begin{tabular}{lll}
+\emph{description} & \emph{command} & \emph{output}\\
+not & \verb!\sim! & $\sim$\\
+and & \verb!\land! & $\land$\\
+or & \verb!\lor! & $\lor$\\
+if...then & \verb!\to! & $\to$\\
+if and only if & \verb!\leftrightarrow! & $\leftrightarrow$\\
+logical equivalence & \verb!\equiv! & $\equiv$\\
+therefore & \verb!\therefore! & $\therefore$\\
+there exists  & \verb!\exists! & $\exists$\\
+for all & \verb!\forall! & $\forall$\\
+implies & \verb!\Rightarrow! & $\Rightarrow$\\
+equivalent & \verb!\Leftrightarrow! & $\Leftrightarrow$
+\end{tabular}
+
+\subsection{Linear algebra}
+\begin{tabular}{lll}
+\emph{description} & \emph{command} & \emph{output}\\
+vector & \verb!\vec{v}! & $\vec{v}$\\
+vector & \verb!\mathbf{v}! & $\mathbf{v}$\\
+norm & \verb!||\vec{v}||! & $||\vec{v}||$\\
+matrix&
+\begin{tabular}{l}
+\verb!\left[!\\
+\verb!\begin{array}{ccc}!\\
+\verb!1 & 2 & 3 \\!\\
+\verb!4 & 5 & 6\\!\\
+\verb!7 & 8 & 0!\\
+\verb!\end{array}!\\
+\verb!\right]!\end{tabular}&
+$\displaystyle \left[\begin{array}{ccc}1 & 2 & 3 \\4 & 5 & 6 \\7 & 8 & 0\end{array}\right]$\\
+\\determinant&
+\begin{tabular}{l}
+\verb!\left|!\\
+\verb!\begin{array}{ccc}!\\
+\verb!1 & 2 & 3 \\!\\
+\verb!4 & 5 & 6 \\!\\
+\verb!7 & 8 & 0!\\
+\verb!\end{array}!\\
+\verb!\right|!
+\end{tabular}&
+$\displaystyle \left|\begin{array}{ccc}1 & 2 & 3 \\4 & 5 & 6 \\7 & 8 & 0\end{array}\right|$\\
+determinant & \verb!\det(A)! & $ \det(A)$\\
+trace & \verb!\operatorname{tr}(A)! & $\operatorname{tr}(A)$\\
+dimension & \verb!\dim(V)! & $\dim(V)$\\
+\end{tabular}
+
+\subsection{Number theory}
+\begin{tabular}{lll}
+\emph{description} & \emph{command} & \emph{output}\\
+divides & \verb!|! & $|$\\
+does not divide & \verb!\not |! & $\not |$\\
+div & \verb!\operatorname{div}! & $\operatorname{div}$\\
+mod & \verb!\mod! & $\operatorname{mod}$\\
+greatest common divisor & \verb!\gcd! & $\gcd$\\
+ceiling & \verb!\lceil x \rceil! & $\lceil x\rceil$\\
+floor & \verb!\lfloor x \rfloor! & $\lfloor x \rfloor$\\
+\end{tabular}
+
+
+
+
+\subsection{Geometry and trigonometry}
+\begin{tabular}{lll}
+\emph{description} & \emph{command} & \emph{output}\\
+angle& \verb!\angle ABC! & $\angle ABC$\\
+degree& \verb!90^{\circ}! & $90^{\circ}$\\
+triangle& \verb!\triangle ABC! & $\triangle ABC$\\
+segment& \verb!\overline{AB}! & $\overline{AB}$\\
+sine& \verb!\sin! & $\sin$\\
+cosine& \verb!\cos! & $\cos$\\
+tangent& \verb!\tan! & $\tan$\\
+cotangent& \verb!\cot! & $\cot$\\
+secant& \verb!\sec! & $\sec$\\
+cosecant& \verb!\csc! & $\csc$\\
+inverse sine& \verb!\arcsin! & $\arcsin$\\
+inverse cosine& \verb!\arccos! & $\arccos$\\
+inverse tangent& \verb!\arctan! & $\arctan$\\
+\end{tabular}
+
+\section{Symbols (in \emph{text} mode)}
+
+The followign symbols do \textbf{not} have to be surrounded by dollar signs.
+
+\begin{tabular}{lll}
+\emph{description} & \emph{command} & \emph{output}\\
+dollar sign & \verb!\$! & \$ \\
+percent & \verb!\%! & \% \\
+ampersand & \verb!\&! & \& \\
+pound & \verb!\#! & \# \\
+backslash & \verb!\textbackslash! & \textbackslash \\
+left quote marks & \verb!``! & `` \\
+right quote marks & \verb!''! & '' \\
+single left quote  & \verb!`! & ` \\
+single right quote  & \verb!'! & ' \\
+hyphen & \verb!X-ray! & X-ray\\
+en-dash & \verb!pp. 5--15! & pp. 5--15 \\
+em-dash & \verb!Yes---or no?! & Yes---or no? 
+\end{tabular}
+
+\section{Resources}
+Great symbol look-up site: \href{http://detexify.kirelabs.org/}{Detexify}\\
+\href{http://amath.colorado.edu/documentation/LaTeX/Symbols.pdf}{\LaTeX\ Mathematical Symbols}\\
+\href{ftp://tug.ctan.org/pub/tex-archive/info/symbols/comprehensive/symbols-letter.pdf}{The Comprehensive \LaTeX\ Symbol List}\\ 
+\href{http://mirrors.med.harvard.edu/ctan/info/lshort/english/lshort.pdf}{The Not So Short Introduction to \LaTeX\ 2$\varepsilon$}\\
+\href{http://www.tug.org/}{TUG: The \TeX\ Users Group}\\
+\href{http://www.ctan.org/}{CTAN: The Comprehensive \TeX\ Archive Network}\\
+~\\
+\LaTeX\ for the Mac: \href{http://www.tug.org/mactex/}{Mac\TeX}\\
+\LaTeX\ for the PC: \href{http://www.texniccenter.org/}{{\TeX}nicCenter} and \href{http://miktex.org/}{MiK\TeX}\\
+\LaTeX\ online: \href{http://www.writelatex.com/}{WriteLaTeX}.
+\vfill
+\hrule
+~\\
+Dave Richeson, Dickinson College, \href{http://divisbyzero.com/}{http://divisbyzero.com/}
+\end{multicols}
+
+\end{document}
