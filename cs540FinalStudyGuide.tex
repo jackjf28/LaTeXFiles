@@ -5,12 +5,14 @@
 \usepackage{multicol,multirow}
 \usepackage{calc}
 \usepackage{ifthen}
+\usepackage{titlesec}
 \usepackage[landscape]{geometry}
 \usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage{titlesec}
 
 
 \ifthenelse{\lengthtest { \paperwidth = 11in}}
-    { \geometry{top=0in,left=.1in,right=.1in,bottom=.2in} }
+    { \geometry{top=-0in,left=.1in,right=.1in,bottom=0.1in} }
 	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
 		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
 		{\geometry{top=1cm,left=1cm,right=1cm,bottom=1cm} }
@@ -18,24 +20,28 @@
 \pagestyle{empty}
 \makeatletter
 \renewcommand{\section}{\@startsection{section}{1}{0mm}%
-                                {-1ex plus -.5ex minus -.2ex}%
-                                {0.5ex plus .2ex}%x
+                                {0.1ex}%-1ex plus -.5ex minus -.2ex}%
+                                {0.1ex}%0.5ex plus .2ex}%x
                                 {\normalfont\normalsize\bfseries}}
 \renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
-                                {-1explus -.5ex minus -.2ex}%
-                                {0.5ex plus .2ex}%
+                                {0.1ex}%-1explus -.5ex minus -.2ex}%
+                                {0.1ex}%$.5ex plus .2ex}%
                                 {\normalfont\footnotesize\bfseries}}
 \renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0mm}%
                                 {-1ex plus -.5ex minus -.2ex}%
                                 {1ex plus .2ex}%
                                 {\normalfont\scriptsize\bfseries}}
+                                
 \makeatother
 \setcounter{secnumdepth}{0}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt plus 0.0ex}
+\setlength{\topskip}{0pt}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
 % -----------------------------------------------------------------------
 
-\title{A \LaTeX{} CS540 Final Study Guide, Spring 2018 - Jack Farrell}
+%\title{A \LaTeX{} CS540 Final Study Guide, Spring 2018 - Jack Farrell}
 
 \begin{document}
 
@@ -43,7 +49,7 @@
 \footnotesize
 
 \begin{center}
-     \Large{\textbf{A \LaTeX{} CS540 Final Study Guide, Spring 2018} - Jack Farrell} 
+%     \Large{\textbf{A \LaTeX{} CS540 Final Study Guide, Spring 2018} - Jack Farrell} 
 \end{center}
 \begin{multicols}{3}
 \setlength{\premulticols}{1pt}
@@ -58,12 +64,9 @@ Constraint Satisfaction Problems (CSPs) :
 
 \textbf{-goal test} is a set of \textbf{constraints} specifying allowable cominations of values for subsets of variables
 
--Main idea of CSPs is to eliminate large portions of the search space all at once by identifying variable/value combos that violate constraints
 %Problem formulation in terms of variables, domains and constraints, constaint graph, DFS, backtracting w/ consistency checking, most constrained var heuristic, most constraining var heuristic, most constraining variable heuristic, least constraining value heuristic, min-conflicts heuristic, min-conflicts algo, forward checking algo, arc consistency algo (AC-3), combining search with CSP inference
 
 \subsection{*Problem formulation in terms of variables}
-
-\textbf{Examples:} N-Queens, Cryparithmetic, Graph/Map Coloring, Scheduling Problems
 
 \textbf{Map-Coloring Example:} 
 
@@ -85,8 +88,6 @@ finite domains: n variables, domain size $d \to{O(d^n)}$ e.g., Boolean CSPs, Boo
 infinite domains: integers, strings, etc e.g., job scheduling, variables are start/end times for each job
 
 \textbf{Continuous Variables}
-
-e.g., start/end times for Hubble Space Telescope observations
 
 linear constraints solvable in polynomial time by linear programming
 
@@ -135,31 +136,22 @@ while not all vars in state assigned a value do
   else
     go back to prev var and assign it another val
 \end{verbatim}
-\subsection{*Most Constrained Var Heur}
--Choose variable with the fewest legal moves(most constraining variable)
+%\textbf{Most Constrained Var Heur}
+%-Choose variable with the fewest legal moves(most constraining variable)
+ %-Called \textbf{minimum remaining values (MRV)} heuristic.
+ %-Minimizes branching factor; Tries to cut off search ASAP
 
--Called \textbf{minimum remaining values (MRV)} heuristic.
+%\textbf{Most \emph{Constraining} Var Heur}
+%-Tie-breaker among most-constrained vars
+ %-Choose var with the most constraints on the remaining variables
+ %-Called the \textbf{degree heuristic}(reduces the branching factor on future choices by selecting varible involved in largest \# of constraints on other unassigned vars, tries to cut off search ASAP
 
--Minimizes branching factor; Tries to cut off search ASAP
-
-\subsection{*Most \emph{Constraining} Var Heur}
--Tie-breaker among most-constrained vars
-
--Choose var with the most constraints on the remaining variables
-
--Called the \textbf{degree heuristic}(reduces the branching factor on future choices by selecting varible involved in largest \# of constraints on other unassigned vars, tries to cut off search ASAP
-
-\subsection{*Least Const Var Heur}
--Variable that rules out the fewest vals in remaining vars
-
--try to pick values \emph{best} first
-\subsection{*Min-Conflicts Heur}
-
--choose value that violates fewest constraints, i.e., hill-climb by minimizing f(n) = total \# of violated constraints
+%\textbf{Least Const Var Heur}
+%-Variable that rules out the fewest vals in remaining vars
+ %-try to pick values \emph{best} first
+%\textbf{Min-Conflicts Heur}
+ %-choose value that violates fewest constraints, i.e., hill-climb by minimizing f(n) = total \# of violated constraints
 \subsection{*Min-Conflicts Algo}
-\setlength\partopsep{-\topsep}
-\addtolength\partopsep{-\parskip}
-\addtolength\partopsep{0em}
 \begin{verbatim}
 1. Assign to each variable a random value, defining the 
 initial state
@@ -192,12 +184,7 @@ Simple and Fast: Given rand init state, can solve n-queens in almost O(1)
 
 -propagates info from assigned to unassigned vars; doesn't provide early detection for all failures
 
-\textbf{-Constraint propagation} recursively enforces constraints for all vars
-\linespread{0}
-\begin{itemize}
-\item \textbf{Main idea:} if value deleted from var's domain, check all vars connected to \emph{it}. If any change,, delete all inconsistent values connected to them, etc.
-\end{itemize}
-
+\textbf{-Constraint propagation} recursively enforces constraints for all vars. \textbf{Main idea:} if value deleted from var's domain, check all vars connected to \emph{it}. If any change,, delete all inconsistent values connected to them, etc.
 
 \subsection{*Arc Consistency Algo(AC-3)}
 
@@ -353,7 +340,7 @@ Simple and Fast: Given rand init state, can solve n-queens in almost O(1)
 
 -During testing, use whole net(weights must all be rescaled)
 
-\subsection{Deep Learning}
+\subsection{*Deep Learning}
 
 -Use many hidden layers(often 10-20)
 
@@ -361,7 +348,7 @@ Simple and Fast: Given rand init state, can solve n-queens in almost O(1)
 
 -\textbf{Issues Training Deep Networks}: Bottom layers don't get trained easily, small data sets result in not enough labeled data for training, use a pre-processing step to init weights, use traditional back-prop to train full net
 
-\subsection{Convolutional Neural Networks}
+\subsection{*Convolutional Neural Networks}
 
 -Extension of multi-layer, feed-forward nets that incorporate the following: Use of \textbf{many layers}(learn a hierarchy of features), \textbf{Local "receptive fields"/filters and local connections}(Layers aren't completely connected, Want translation-invariant local features), \textbf{Shared weights, Pooling}
 
@@ -380,9 +367,7 @@ ReL\=U Layers\\
 \>-Layer size = to size of layer below it\\
 \end{tabbing}
 
-\subsection{Pooling}
-
-\textbf{Pooling Layers}: Follows ReLU layer.  Combines neighboring values to give a single output at the next layer. \textbf{Max Pooling}: Combine by taking max, \textbf{Avg Pooling}, \textbf{Sub-Sampling}: Reduces size of next layer according to size of pooling filter. \textbf{ex:}a 2x2 filter reduces size by $\frac{1}{2}$ in each dimension
+\textbf{Pooling Layers}: Follows ReLU layer.  Gets a small amount of translational invariance \& robustness to noise by combining  neighboring values to give a single output at the next layer. \textbf{Max Pooling}: Combine by taking max, \textbf{Avg Pooling}, \textbf{Sub-Sampling}: Reduces size of next layer according to size of pooling filter. \textbf{ex:}a 2x2 filter reduces size by $\frac{1}{2}$ in each dimension
 
 \section{**Reasoning under Uncertainty}
 
@@ -390,19 +375,99 @@ ReL\=U Layers\\
 
 \textbf{3 Axioms of probability}: \textbf{1.} $0 \le P(A) \le 1$ \textbf{2.} $P(true)=1,P(false)=0$ \textbf{3.} $P(A\lor B)=P(A)+P(B) - P(A\land B)$
 
+Thms derived from Axioms: $P(\neg A)=1-P(A), P(B)=\sum_{i=1...k}P(B,A=a_i)$
+
 \textbf{Joint Probability}: P(A=a, B=b), shorthand $P(A=a\land B=b)$
 
-\textbf{Conditional Prob}: P(a | e): fraction of time 
+\textbf{Conditional Prob}: $P(a | e)$: Specifies belief in a proposition that is conditioned on a proposition being true. Behaves the same
+\textbf{-With Mult Evidence}: $P(\neg B|F, \neg Y)=P(\neg B, F, \neg Y) / P(F,\neg Y)$
+
+\textbf{Prior Prob}: prior to having any data about an event/other events. 
+\textbf{Marginal Probs}: summing over all other variables.(i.e., \textbf{Summing out})
+\textbf{Posterior Prob}: Prob of A after knowing evidence B (i.e., $P(A|B)$)
+
+
+\subsection{Important Rules}
+\begin{tabular}{ll}
+Conditional Probability&$P(A|B)=\frac{P(A,B)}{P(B)}$\\
+Product Rule&$P(A,B)=P(A|B)P(B)$\\
+Chain Rule&$P(A,B,C,D)=P(A|B,C,D)$\\&$P(B|C,D)P(C|D)P(D)$\\
+Cond V. of Chain Rule&$P(A,B|C)=P(A|B,C)P(B|C)$\\
+Bayes's Rule&$P(A|B)=\frac{P(B|A)P(A)}{P(B))}$\\
+Cond V. of Bayes's&$P(A|B,C)=\frac{P(B|A,C)P(A|C)}{P(B|C)}$\\
+Addition/Conditioning rule&$P(A)=P(A,B)+P(A,\neg B)$\\&\tiny{$P(A)=P(A|B)P(B)+P(A|\neg B)P(\neg B)$}\\
+\end{tabular}
+
+\textbf{Normalization}: using a normalization constant for distribution(i.e., $P(\neg B|F)+P(B|F)=1$)
+\textbf{Degrees of Freedom}: \# of independent values
+\textbf{Independence}: 2 events A,B independent if one of following hold, P(A,B)=P(A)P(B)...$P(A|B)=P(A)...$
+
+\textbf{Conditional Independence}: ``A \& B are cond indep given C'' means: $P(A|B,C)=P(A|C), P(B|A,C)=P(B|C), P(A,B|C)=P(A|C)P(B|C)$
+
+\textbf{Naive Bayes Classifier}: $argmax_cP(Y=c)\prod_{i=1}^nP(X_i=v_i)|Y=c)$
+
+-Assume all values conditionally indep
+
+-Cond probs can be small, to avoid underflow, use $argmax_c logP(Y=c)+\sum_{i=1}^nlogP(X_i=v_i|Y=c)$
+
+\textbf{Add-1 Smoothing}: Train data may not include some cases, this ensures every cond prob >0 by pretending you see each attr val 1 extra time,
+
+$P(X=v_i|Y=c)=\frac{count(X=v_i,Y=c)+1}{count(Y=c)+m}$
+
+
+
+\textbf{Lapace Smoothing}: instead of adding 1, add a + real \#, $\delta$
 %Random variable, mutually exclusive, prior probability, 3 axioms of probability, joint probability, conditional probability, posterior probabililty, full joint probability distro, degrees of freedom, summing out, marginalization, normalization, product rule, chain rule, conditionalized version of summing out, marginalization, normalization, product rule, chain rule, Baye's rule, conditionalized version of Bayes's rule, addition/conditioning rule, independence, conditional independence, naive Bayes classifier, add-1 smoothing, Laplace smoothing.
 
- 
 \section{**Bayesian Networks} 
 
+-Allow us to represent joint distros in manageable chucks using Indep \& Cond Indep
+\subsection{*Bayesian Network Directed Acrylic Graphs}
+-Nodes=random vars, cond prob tables(CPTs) stored at each node quantifies cond prob of node's
+
+\textbf{Deductive} influence of directed graph $A\to B$ means evidence for A increases liikelihood of B, ev for B increases liklihood of A for \textbf{abductive}
+
+\textbf{Cond Indep in BNs}: A node is cond indep of its non-descendants, given its parents, also CI of all other nodes given parents, children, and children's parents.  $A\to C \leftarrow B$: A and B are indep given nothing else, dependent given C.
+
+\textbf{Inference By Enum}:
+
+Algorithm: $P(E_1|E_2)=\frac{P(E_1\land E_2)}{P(E_2)}=\frac{\sum_{joint entries matching E_1 and E_2}P(joint entry)}{\sum_{joint entries matching E_2}P(joint entry)}$
+
+There are $k^{N-j}$ joints to sum, k=number of values per var, N=numVars, j=evidence vars, but can compute any cond prob
+
+\textbf{Smoothing CPTs}: Ex)$P(A|B,E)$=[\#(A)+1 + \#$(\neg A)+1$], Saves you when you don't have enough data, hides when you do.
+-For Naive Bayes: $P(V_i|c)=\frac{n_{ci}+1}{n_c+k}$, $n_{ci}$=\# timestoken type $v_i$ occurs, $n_c$=total \# of tokens in all examples of class c
 %Bayesian network DAG, conditional probability tables, space saving compared to full joint prob distro table, conditional independence property defined by a Bayesian network, inference by enumeration from a Bayesian network, naive Bayes classifier, add-1 smoothing, Laplace smoothing
 
 
 
 \section{**Speech Recognition}
+
+-Mapping acoustic signal into a string of words
+
+\textbf{Phones}: Distinct sounds in the human language.(Characterized in terms of acoustic features, e.g., frequency and amplitude) \textbf{Phonemes}: equivalence classes of phones that cant be distinguished from each other
+
+\textbf{Applying Bayes}: $P(Words|Signal)=P(Signal|Words)P(Words)/P(Signal)$
+
+P(Words): \textbf{Language Model} $\to$ Likelihood of words being heard, e.g., "recognize speech"
+
+-Joint Prob that a seq of Words is likely for specified language(chain rule). \textbf{Bigram}: only depends on prev word, \textbf{Trigram}:two prev words
+
+-\textbf{First-order Markov Assumption}: Prob of a word only depends on prev word(bigram model). Probabilities stored in a \textbf{Probabilistic finite state machine}: Almost fully connected directed graph, Nodes are all possible words and a START state, arcs labeled w/ probability from START to a word is the prior prob of dest word being first word. CP after first word.
+
+$P(Signal|Words)$: \textbf{Acoustic Model}: liklihood of sig given word seq, accounts for diff pronunciations.
+
+-\textbf{Two Probabilities}: $P(Phones|Word)$(Markov Model), $P(Signal|Phones)$(Hidden Markov Model)
+
+\textbf{$1_{st}$-order Markov Model}:Assumption: State $q_{t+1}$ is CI of other states given $q_t$. -Discrete set of states, $s_1,s_2,...,s_N$ \textbf{$\pi$ Vector}: \textbf{$\pi_i$} = $P(q_1=s_i)$ Prior probabilities of the init state at time t=0. \textbf{State Trans Matrix}:\textbf{A}=$(a_{ij})$, where $a_{ij}$=$P(q_{t+1}=s_j|q_t=s_i)$ Helps move markov process from state-to-state, graph of probabilities.
+
+\textbf{HMMs}: -Hidden States: Represented as 1st order MM, states of real interest. -Observable States: related to HSs
+
+-\textbf{Observation Likelihood Matrix}(Output Prob Distro):Stores probabilities associated w/arcs from hidden to observable states($P(Observed|Hidden)$).
+
+-An HMM, $\lambda$ = \textbf{A, B, $\pi$}, contains 3 sets of probs
+
+-\textbf{$\pi$} vector, \textbf{$\pi$}=($\pi_i$), -State trans matrix, \textbf{A}=($a_{ij}$), where $a_{ij}=P(q_t=s_i|q_{t-1}=s_j)$, Observation liklihood Matrix, \textbf{B}=$b_j(o_k)=P(y_t=o_k|q_t=s_j)$, o=observable s=hidden
 
 %Phones, phonemes, speech recog using Bayes's rule, language model, acoustic model, bigram model, trigram model, first-order Markov assumption, probabilistic finit state machine, first-order Markov model, state transition matrix, pi vector, computing conditional probabilities from a Markov model, hidden Markov model, observation likelihood matrix, computing joint probabilities and conditional probabilities from an HMM by enumeration.  (Nothing ond Forward algo, Viterbi algo, Forward-Backward algo, Siri, particle filters, tracking in video.)
 
@@ -410,215 +475,14 @@ ReL\=U Layers\\
 
 \section{**Computer Vision}
 
+\textbf{Viola-Jones Algorithm}: -Compute lots of simple features, -Efficiently choose best features, -Each feature is used to define a "Weak Classifier"("aka decision stump"), -Combine weak classifiers into an ensemble classifier(EC) based on boosting(Adaboost), -Learn mult ECs and ``cascade'' them together to improve classification accuracy and speed
+
+\textbf{Decision Stump}: acts as a Dec Tree w/ a root node, containing the test $h_t(x)$, and 2 leaft nodes below
 %Viola-Jones face detection algo, boosting ensemble learning, AdaBoost algo, weak classifier, weighted-majority classification, decision stump.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 \newpage
-\newpage
-
-\subsection{Functions}
-\begin{tabular}{lll}
-\emph{description} & \emph{command} & \emph{output}\\
-maps to & \verb!\to! & $\to$\\
-composition& \verb!\circ! & $\circ$\\
-piecewise& \verb!|x|=! & \multirow{5}{*}{$\displaystyle |x|=\begin{cases}x&x\ge 0\\-x&x<0\end{cases}$}\\
-function&\verb!\begin{cases}!&\\ 
-&\verb!x & x\ge 0\\!&\\ 
-&\verb!-x & x<0!&\\ 
-&\verb!\end{cases}!&
-\end{tabular}
-
-\subsection{Greek and Hebrew letters}
-\begin{tabular}{llll}
-\emph{command} & \emph{output}&\emph{command} & \emph{output}\\
-\verb!\alpha! & $\alpha$&\verb!\tau! & $\tau$\\
-\verb!\beta! & $\beta$&\verb!\theta! & $\theta$\\
-\verb!\chi! & $\chi$&\verb!\upsilon! & $\upsilon$\\
-\verb!\delta! & $\delta$&\verb!\xi! & $\xi$\\
-\verb!\epsilon! & $\epsilon$&\verb!\zeta! & $\zeta$\\
-\verb!\varepsilon! & $\varepsilon$&\verb!\Delta! & $\Delta$\\
-\verb!\eta! & $\eta$&\verb!\Gamma! & $\Gamma$\\
-\verb!\gamma! & $\gamma$&\verb!\Lambda! & $\Lambda$\\
-\verb!\iota! & $\iota$&\verb!\Omega! & $\Omega$\\
-\verb!\kappa! & $\kappa$&\verb!\Phi! & $\Phi$\\
-\verb!\lambda! & $\lambda$&\verb!\Pi! & $\Pi$\\
-\verb!\mu! & $\mu$&\verb!\Psi! & $\Psi$\\
-\verb!\nu! & $\nu$&\verb!\Sigma! & $\Sigma$\\
-\verb!\omega! & $\omega$&\verb!\Theta! & $\Theta$\\
-\verb!\phi! & $\phi$&\verb!\Upsilon! & $\Upsilon$\\
-\verb!\varphi! & $\varphi$&\verb!\Xi! & $\Xi$\\
-\verb!\pi! & $\pi$&\verb!\aleph! & $\aleph$\\
-\verb!\psi! & $\psi$&\verb!\beth! & $\beth$\\
-\verb!\rho! & $\rho$&\verb!\daleth! & $\daleth$\\
-\verb!\sigma! & $\sigma$&\verb!\gimel! & $\gimel$
-\end{tabular}
-
-
-\subsection{Set theory}
-\begin{tabular}{lll}
-\emph{description} & \emph{command} & \emph{output}\\
-set brackets & \verb!\{1,2,3\}! & $\{1,2,3\}$\\
-element of & \verb!\in! & $\in$\\
-not an element of & \verb!\not\in! & $\not\in$\\
-subset of & \verb!\subset! & $\subset$\\
-subset of & \verb!\subseteq! & $\subseteq$\\
-not a subset of & \verb!\not\subset! & $\not\subset$\\
-contains & \verb!\supset! & $\supset$\\
-contains & \verb!\supseteq! & $\supseteq$\\
-union & \verb!\cup! & $\cup$\\
-intersection & \verb!\cap! & $\cap$\\
-big union & 
-\verb!\bigcup_{n=1}^{10}A_n! &
-$\displaystyle \bigcup_{n=1}^{10}A_{n}$\\
-big intersection & \verb!\bigcap_{n=1}^{10}A_n! &$\displaystyle \bigcap_{n=1}^{10}A_{n}$\\
-empty set & \verb!\emptyset! & $\emptyset$\\
-power set & \verb!\mathcal{P}! & $\mathcal{P}$\\
-minimum & \verb!\min! & $\min$\\
-maximum & \verb!\max! & $\max$\\
-supremum & \verb!\sup! & $\sup$\\
-infimum & \verb!\inf! & $\inf$\\
-limit superior & \verb!\limsup! & $\limsup$\\
-limit inferior & \verb!\liminf! & $\liminf$\\
-closure & \verb!\overline{A}! & $\overline{A}$
-\end{tabular}
-
-\subsection{Calculus}
-\begin{tabular}{lll}
-\emph{description} & \emph{command} & \emph{output}\\
-derivative & \verb!\frac{df}{dx}! & $\displaystyle \frac{df}{dx}$\\
-derivative & \verb!\f'! & $f'$\\
-partial derivative & 
-\begin{tabular}{l}
-\verb!\frac{\partial f}!\\ \verb!{\partial x}! 
-\end{tabular}& $\displaystyle \frac{\partial f}{\partial x}$\\
-integral & \verb!\int! & $\displaystyle\int$\\
-double integral & \verb!\iint! & $\displaystyle\iint$\\
-triple integral & \verb!\iiint! & $\displaystyle\iiint$\\
-limits & \verb!\lim_{x\to \infty}! & $\displaystyle \lim_{x\to \infty}$\\
-summation  & 
-\verb!\sum_{n=1}^{\infty}a_n! &
-$\displaystyle \sum_{n=1}^{\infty}a_n$\\
-product  & 
-\verb!\prod_{n=1}^{\infty}a_n! &
-$\displaystyle \prod_{n=1}^{\infty}a_n$
-\end{tabular}
-
-
-
-
-\subsection{Logic}
-\begin{tabular}{lll}
-\emph{description} & \emph{command} & \emph{output}\\
-not & \verb!\sim! & $\sim$\\
-and & \verb!\land! & $\land$\\
-or & \verb!\lor! & $\lor$\\
-if...then & \verb!\to! & $\to$\\
-if and only if & \verb!\leftrightarrow! & $\leftrightarrow$\\
-logical equivalence & \verb!\equiv! & $\equiv$\\
-therefore & \verb!\therefore! & $\therefore$\\
-there exists  & \verb!\exists! & $\exists$\\
-for all & \verb!\forall! & $\forall$\\
-implies & \verb!\Rightarrow! & $\Rightarrow$\\
-equivalent & \verb!\Leftrightarrow! & $\Leftrightarrow$
-\end{tabular}
-
-\subsection{Linear algebra}
-\begin{tabular}{lll}
-\emph{description} & \emph{command} & \emph{output}\\
-vector & \verb!\vec{v}! & $\vec{v}$\\
-vector & \verb!\mathbf{v}! & $\mathbf{v}$\\
-norm & \verb!||\vec{v}||! & $||\vec{v}||$\\
-matrix&
-\begin{tabular}{l}
-\verb!\left[!\\
-\verb!\begin{array}{ccc}!\\
-\verb!1 & 2 & 3 \\!\\
-\verb!4 & 5 & 6\\!\\
-\verb!7 & 8 & 0!\\
-\verb!\end{array}!\\
-\verb!\right]!\end{tabular}&
-$\displaystyle \left[\begin{array}{ccc}1 & 2 & 3 \\4 & 5 & 6 \\7 & 8 & 0\end{array}\right]$\\
-\\determinant&
-\begin{tabular}{l}
-\verb!\left|!\\
-\verb!\begin{array}{ccc}!\\
-\verb!1 & 2 & 3 \\!\\
-\verb!4 & 5 & 6 \\!\\
-\verb!7 & 8 & 0!\\
-\verb!\end{array}!\\
-\verb!\right|!
-\end{tabular}&
-$\displaystyle \left|\begin{array}{ccc}1 & 2 & 3 \\4 & 5 & 6 \\7 & 8 & 0\end{array}\right|$\\
-determinant & \verb!\det(A)! & $ \det(A)$\\
-trace & \verb!\operatorname{tr}(A)! & $\operatorname{tr}(A)$\\
-dimension & \verb!\dim(V)! & $\dim(V)$\\
-\end{tabular}
-
-\subsection{Number theory}
-\begin{tabular}{lll}
-\emph{description} & \emph{command} & \emph{output}\\
-divides & \verb!|! & $|$\\
-does not divide & \verb!\not |! & $\not |$\\
-div & \verb!\operatorname{div}! & $\operatorname{div}$\\
-mod & \verb!\mod! & $\operatorname{mod}$\\
-greatest common divisor & \verb!\gcd! & $\gcd$\\
-ceiling & \verb!\lceil x \rceil! & $\lceil x\rceil$\\
-floor & \verb!\lfloor x \rfloor! & $\lfloor x \rfloor$\\
-\end{tabular}
-
-
-
-
-\subsection{Geometry and trigonometry}
-\begin{tabular}{lll}
-\emph{description} & \emph{command} & \emph{output}\\
-angle& \verb!\angle ABC! & $\angle ABC$\\
-degree& \verb!90^{\circ}! & $90^{\circ}$\\
-triangle& \verb!\triangle ABC! & $\triangle ABC$\\
-segment& \verb!\overline{AB}! & $\overline{AB}$\\
-sine& \verb!\sin! & $\sin$\\
-cosine& \verb!\cos! & $\cos$\\
-tangent& \verb!\tan! & $\tan$\\
-cotangent& \verb!\cot! & $\cot$\\
-secant& \verb!\sec! & $\sec$\\
-cosecant& \verb!\csc! & $\csc$\\
-inverse sine& \verb!\arcsin! & $\arcsin$\\
-inverse cosine& \verb!\arccos! & $\arccos$\\
-inverse tangent& \verb!\arctan! & $\arctan$\\
-\end{tabular}
-
-\section{Symbols (in \emph{text} mode)}
-
-The followign symbols do \textbf{not} have to be surrounded by dollar signs.
-
-\begin{tabular}{lll}
-\emph{description} & \emph{command} & \emph{output}\\
-dollar sign & \verb!\$! & \$ \\
-percent & \verb!\%! & \% \\
-ampersand & \verb!\&! & \& \\
-pound & \verb!\#! & \# \\
-backslash & \verb!\textbackslash! & \textbackslash \\
-left quote marks & \verb!``! & `` \\
-right quote marks & \verb!''! & '' \\
-single left quote  & \verb!`! & ` \\
-single right quote  & \verb!'! & ' \\
-hyphen & \verb!X-ray! & X-ray\\
-en-dash & \verb!pp. 5--15! & pp. 5--15 \\
-em-dash & \verb!Yes---or no?! & Yes---or no? 
-\end{tabular}
 
 \section{Resources}
 Great symbol look-up site: \href{http://detexify.kirelabs.org/}{Detexify}\\
@@ -634,7 +498,7 @@ Great symbol look-up site: \href{http://detexify.kirelabs.org/}{Detexify}\\
 \vfill
 \hrule
 ~\\
-Dave Richeson, Dickinson College, \href{http://divisbyzero.com/}{http://divisbyzero.com/}
+Jack Farrell, jfarrell3@wisc.edu
 \end{multicols}
 
 \end{document}
